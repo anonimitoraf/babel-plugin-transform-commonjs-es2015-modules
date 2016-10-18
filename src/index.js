@@ -81,9 +81,25 @@ export default ({types: t}) => ({
             assignmentExpression.node.right.arguments.length === 1
           ) {
             assignmentExpression.parentPath.replaceWith(
-              t.exportAllDeclaration(
+
+              // Output:
+              // export { default } from 'foo'
+
+              t.exportNamedDeclaration(
+                null,
+                [t.exportSpecifier(
+                  t.identifier('default'),
+                  t.identifier('default')
+                )],
                 assignmentExpression.node.right.arguments[0]
               )
+
+              // Output:
+              // export * from 'foo'
+
+              // t.exportAllDeclaration(
+              //   assignmentExpression.node.right.arguments[0]
+              // )
             )
           }
 
