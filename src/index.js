@@ -6,6 +6,7 @@ export default ({types: t}) => ({
         t.isStringLiteral(path.node.arguments[0]) &&
         path.node.arguments.length === 1
       ) {
+        const program = path.findParent(t.isProgram)
         const dependencyName = path.node.arguments[0].value
 
         // Scenario:
@@ -18,19 +19,22 @@ export default ({types: t}) => ({
           const assignedName = path.parentPath.node.id.name
 
           if (t.isVariableDeclaration(path.parentPath.parentPath.node)) {
-            path.parentPath.parentPath.replaceWith(
+            const importName = path.scope.generateUidIdentifier(assignedName)
+            program.node.body.unshift(
               t.importDeclaration(
                 [t.importDefaultSpecifier(
-                  t.identifier(assignedName)
+                  importName
                 )],
                 t.stringLiteral(dependencyName)
               )
             )
+            path.parentPath.node.init = importName
           }
         }
 
         // Scenario:
         // var foo = require('bar').baz;
+        // TODO: Support chained member expressions like require('foo').bar.baz.lol
 
         else if (
           t.isMemberExpression(path.parentPath.node, {computed: false})
@@ -42,13 +46,18 @@ export default ({types: t}) => ({
             t.isVariableDeclarator(memberExpressionPath.parentPath.node) &&
             t.isIdentifier(memberExpressionPath.parentPath.node.id)
           ) {
+            const variableDeclarator = memberExpressionPath.parentPath.node
             const assignedName = memberExpressionPath.parentPath.node.id
 
             if (t.isVariableDeclaration(memberExpressionPath.parentPath.parentPath.node)) {
-              memberExpressionPath.parentPath.parentPath.replaceWith(
+              const importName = path.scope.generateUidIdentifierBasedOnNode(assignedName)
+
+              variableDeclarator.init = importName
+
+              program.node.body.unshift(
                 t.importDeclaration(
                   [t.importSpecifier(
-                    assignedName,
+                    importName,
                     propertyName
                   )],
                   t.stringLiteral(dependencyName)
