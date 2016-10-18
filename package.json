@@ -9,12 +9,13 @@
     "babel-cli": "^6.16.0",
     "babel-preset-latest": "^6.16.0",
     "babel-preset-stage-0": "^6.16.0",
-    "mocha": "^3.1.0"
+    "mocha": "^3.1.0",
+    "snazzy": "^5.0.0"
   },
   "scripts": {
     "clean": "rm -rf lib",
     "build": "babel src -d lib",
-    "test": "mocha",
+    "test": "snazzy src && mocha",
     "test:watch": "npm run test -- --watch",
     "prepublish": "npm run clean && npm run build"
   },
