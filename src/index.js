@@ -205,23 +205,37 @@ module.exports = ({types: t}) => ({
             )
           )
         }
-
-        // Scenario:
-        // exports.foo = bar;
-
+        
         else if (t.isExpression(assignmentExpression.node.right)) {
-          assignmentExpression.parentPath.replaceWith(
-            t.exportNamedDeclaration(
-              t.variableDeclaration(
-                'var',
-                [t.variableDeclarator(
-                  namedExport,
-                  assignmentExpression.node.right
-                )]
-              ),
-              []
+
+          // Scenario:
+          // exports.default = bar;
+
+          if (t.isIdentifier(namedExport, {name: 'default'})) {
+            assignmentExpression.parentPath.replaceWith(
+              t.exportDefaultDeclaration(
+                assignmentExpression.node.right
+              )
             )
-          )
+          }
+
+          // Scenario:
+          // exports.foo = bar;
+
+          else {
+            assignmentExpression.parentPath.replaceWith(
+              t.exportNamedDeclaration(
+                t.variableDeclaration(
+                  'var',
+                  [t.variableDeclarator(
+                    namedExport,
+                    assignmentExpression.node.right
+                  )]
+                ),
+                []
+              )
+            )
+          }
         }
       }
     }
