@@ -59,6 +59,11 @@ exports.foo = require('bar');
 export { default as foo } from 'bar';
 
 // in:
+exports.default = foo;
+// out:
+export default foo;
+
+// in:
 exports.foo = bar;
 // out:
 export var foo = bar;
