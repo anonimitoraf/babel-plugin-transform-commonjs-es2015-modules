@@ -1,26 +1,22 @@
-import path from 'path'
-import fs from 'fs'
-import assert from 'assert'
-import {transformFileSync} from 'babel-core'
-import plugin from '../src'
+const { join } = require('path')
+const { readdirSync, readFileSync } = require('fs')
+const { equal } = require('assert')
+const { transformFileSync } = require('babel-core')
+const plugin = require('../src')
 
-function trim(str) {
-  return str.replace(/^\s+|\s+$/, '')
-}
-
-describe('', () => {
-  const fixturesDir = path.join(__dirname, 'fixtures')
-  fs.readdirSync(fixturesDir).map((caseName) => {
+describe(require('../package.json').description, () => {
+  const fixturesDir = join(__dirname, 'fixtures')
+  readdirSync(fixturesDir).map((caseName) => {
     it(`should ${caseName.split('-').join(' ')}`, () => {
-      const fixtureDir = path.join(fixturesDir, caseName)
-      const actualPath = path.join(fixtureDir, 'actual.js')
+      const fixtureDir = join(fixturesDir, caseName)
+      const actualPath = join(fixtureDir, 'actual.js')
       const actual = transformFileSync(actualPath).code
 
-      const expected = fs.readFileSync(
-        path.join(fixtureDir, 'expected.js')
+      const expected = readFileSync(
+        join(fixtureDir, 'expected.js')
       ).toString()
 
-      assert.equal(trim(actual), trim(expected))
+      equal(actual.trim(), expected.trim())
     })
   })
 })
