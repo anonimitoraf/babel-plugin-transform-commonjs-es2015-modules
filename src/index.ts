@@ -1,17 +1,16 @@
-import * as babel from '@babel/core';
-import * as t from '@babel/types';
-import { Binding, NodePath, Scope } from '@babel/traverse';
+import * as types from '@babel/types';
+import { NodePath } from '@babel/traverse';
 import { PluginPass } from '@babel/core';
 
-const transform = () => ({
+const transform = ({ types: t }: { types: typeof types }) => ({
   visitor: {
-    CallExpression (path: NodePath<t.CallExpression>, state: PluginPass) {
+    CallExpression (path: NodePath<types.CallExpression>, state: PluginPass) {
       if (
         t.isIdentifier(path.node.callee, {name: 'require'}) &&
         t.isStringLiteral(path.node.arguments[0]) &&
         path.node.arguments.length === 1
       ) {
-        const program = path.findParent(t.isProgram) as NodePath<t.Program>;
+        const program = path.findParent(t.isProgram) as NodePath<types.Program>;
         const dependencyName = path.node.arguments[0].value;
 
         const importAlias = path.scope.generateUidIdentifier(dependencyName);
