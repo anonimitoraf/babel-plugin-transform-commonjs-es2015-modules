@@ -2,6 +2,12 @@ import * as types from '@babel/types';
 import { NodePath } from '@babel/traverse';
 import { PluginPass } from '@babel/core';
 
+interface CustomOpts {
+  importIdentifierPrefix?: string
+}
+
+const extractOpts = (state: PluginPass) => state.opts as CustomOpts;
+
 const transform = ({ types: t }: { types: typeof types }) => ({
   visitor: {
     CallExpression (path: NodePath<types.CallExpression>, state: PluginPass) {
@@ -13,7 +19,7 @@ const transform = ({ types: t }: { types: typeof types }) => ({
         const program = path.findParent(t.isProgram) as NodePath<types.Program>;
         const dependencyName = path.node.arguments[0].value;
 
-        const importAlias = path.scope.generateUidIdentifier(dependencyName);
+        const importAlias = path.scope.generateUidIdentifier(`${extractOpts(state).importIdentifierPrefix || ''}${dependencyName}`);
         const importDeclaration = t.importDeclaration(
           [t.importDefaultSpecifier(importAlias)],
           t.stringLiteral(dependencyName)

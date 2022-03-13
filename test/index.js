@@ -14,7 +14,7 @@ describe(require('../package.json').description, () => {
       it(`should ${caseName.split('-').join(' ')}`, () => {
         const fixtureDir = join(fixturesDir, caseName)
         const actualPath = join(fixtureDir, 'actual.js')
-        const actual = transformFileSync(actualPath).code
+        const actual = transformFileSync(actualPath, { plugins: [plugin] }).code
 
         const expected = readFileSync(
           join(fixtureDir, 'expected.js')
