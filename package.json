@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-transform-modules-commonjs-to-es2015",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "CommonJS to ES2015 modules (export/import) transformation plugin for Babel",
   "repository": "https://github.com/anonimitoraf/babel-plugin-transform-commonjs-es2015-modules",
   "author": "Rafael Nicdao <nicdaoraf@gmail.com>",
