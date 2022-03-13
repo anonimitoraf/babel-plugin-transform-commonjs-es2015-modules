@@ -1,10 +1,10 @@
 {
-  "name": "babel-plugin-transform-commonjs-es2015-modules",
-  "version": "4.0.1",
+  "name": "babel-plugin-transform-modules-commonjs-to-es2015",
+  "version": "0.0.0",
   "description": "CommonJS to ES2015 modules (export/import) transformation plugin for Babel",
-  "repository": "gitlab:sebdeckers/babel-plugin-transform-commonjs-es2015-modules",
-  "author": "Sebastiaan Deckers <sebdeckers83@gmail.com>",
-  "main": "src",
+  "repository": "https://github.com/anonimitoraf/babel-plugin-transform-commonjs-es2015-modules",
+  "author": "Rafael Nicdao <nicdaoraf@gmail.com>",
+  "main": "dist",
   "dependencies": {
     "@babel/core": "^7.16.7",
     "@babel/parser": "^7.16.7",
