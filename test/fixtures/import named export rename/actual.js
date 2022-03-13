@@ -1,1 +1,1 @@
-var foo = require('bar').baz;
+var foo = require('bar');

@@ -1,2 +1,2 @@
-import _foo from 'bar';
-const foo = _foo;
+import _bar from "bar";
+const foo = _bar;

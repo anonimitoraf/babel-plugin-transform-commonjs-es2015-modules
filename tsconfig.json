@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "ESNext"
+    ],
+    "outDir": "dist",
+    "removeComments": false,
+    "target": "ES6",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "module": "CommonJS",
+    "paths": {},
+    "sourceMap": true,
+    "sourceRoot": "/",
+    "alwaysStrict": false,
+    "allowUnreachableCode": true,
+    "noImplicitAny": false,
+    "noImplicitUseStrict": true,
+    "strictNullChecks": true,
+    "noImplicitReturns": false,
+    "noUncheckedIndexedAccess": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "strict": false,
+    "declaration": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "node_modules/**/*"
+  ]
+}

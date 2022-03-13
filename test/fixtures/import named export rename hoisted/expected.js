@@ -1,4 +1,5 @@
-import { baz as _foo } from 'bar';
+import _bar from "bar";
+
 if (true) {
-  var foo = _foo;
+  var foo = _bar.baz;
 }

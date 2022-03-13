@@ -1,74 +1,30 @@
-module.exports = ({types: t}) => ({
+import * as babel from '@babel/core';
+import * as t from '@babel/types';
+import { Binding, NodePath, Scope } from '@babel/traverse';
+import { PluginPass } from '@babel/core';
+
+const transform = () => ({
   visitor: {
-    CallExpression (path) {
+    CallExpression (path: NodePath<t.CallExpression>, state: PluginPass) {
       if (
         t.isIdentifier(path.node.callee, {name: 'require'}) &&
         t.isStringLiteral(path.node.arguments[0]) &&
         path.node.arguments.length === 1
       ) {
-        const program = path.findParent(t.isProgram)
-        const dependencyName = path.node.arguments[0].value
+        const program = path.findParent(t.isProgram) as NodePath<t.Program>;
+        const dependencyName = path.node.arguments[0].value;
 
-        // Scenario:
-        // var foo = require('bar')
+        const importAlias = path.scope.generateUidIdentifier(dependencyName);
+        const importDeclaration = t.importDeclaration(
+          [t.importDefaultSpecifier(importAlias)],
+          t.stringLiteral(dependencyName)
+        );
 
-        if (
-          t.isVariableDeclarator(path.parentPath.node) &&
-          t.isIdentifier(path.parentPath.node.id)
-        ) {
-          const assignedName = path.parentPath.node.id.name
-
-          if (t.isVariableDeclaration(path.parentPath.parentPath.node)) {
-            const importName = path.scope.generateUidIdentifier(assignedName)
-            program.node.body.unshift(
-              t.importDeclaration(
-                [t.importDefaultSpecifier(
-                  importName
-                )],
-                t.stringLiteral(dependencyName)
-              )
-            )
-            path.parentPath.node.init = importName
-          }
-        }
-
-        // Scenario:
-        // var foo = require('bar').baz;
-        // TODO: Support chained member expressions like require('foo').bar.baz.lol
-
-        else if (
-          t.isMemberExpression(path.parentPath.node, {computed: false})
-        ) {
-          const memberExpressionPath = path.parentPath
-          const propertyName = memberExpressionPath.node.property
-
-          if (
-            t.isVariableDeclarator(memberExpressionPath.parentPath.node) &&
-            t.isIdentifier(memberExpressionPath.parentPath.node.id)
-          ) {
-            const variableDeclarator = memberExpressionPath.parentPath.node
-            const assignedName = memberExpressionPath.parentPath.node.id
-
-            if (t.isVariableDeclaration(memberExpressionPath.parentPath.parentPath.node)) {
-              const importName = path.scope.generateUidIdentifierBasedOnNode(assignedName)
-
-              variableDeclarator.init = importName
-
-              program.node.body.unshift(
-                t.importDeclaration(
-                  [t.importSpecifier(
-                    importName,
-                    propertyName
-                  )],
-                  t.stringLiteral(dependencyName)
-                )
-              )
-            }
-          }
-        }
+        const lastImportIdx = program.node.body.map(stmt => t.isImportDeclaration(stmt)).lastIndexOf(true);
+        program.node.body.splice(lastImportIdx + 1, 0, importDeclaration);
+        path.replaceWith(importAlias);
       }
     },
-
     MemberExpression (path) {
       if (
         t.isIdentifier(path.node.object, {name: 'module'}) &&
@@ -205,7 +161,7 @@ module.exports = ({types: t}) => ({
             )
           )
         }
-        
+
         else if (t.isExpression(assignmentExpression.node.right)) {
 
           // Scenario:
@@ -240,4 +196,6 @@ module.exports = ({types: t}) => ({
       }
     }
   }
-})
+});
+
+export default transform;

@@ -1,2 +1,2 @@
-import _foo from 'bar';
-var foo = _foo;
+import _bar from "bar";
+var foo = _bar;

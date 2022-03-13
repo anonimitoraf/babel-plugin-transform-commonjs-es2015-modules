@@ -1,0 +1,15 @@
+#+TITLE: Notes
+
+* Scenarios to implement
+#+begin_src js
+const a = require('m')('a');
+const b = require('m').a.b;
+const c = require('m') ['c'];
+const d = require('m'),
+  { e } = require('m');
+const { f } = require('m');
+const [ g, h ] = require('m');
+const i = require('m')?.i;
+const [ j, ...ks ] = require('m');
+const { l: { m: { n } } } = require('m');
+#+end_src
