@@ -30,16 +30,16 @@ const transform = ({ types: t }: { types: typeof types }) => ({
         path.replaceWith(importAlias);
       }
     },
-    MemberExpression (path) {
+    MemberExpression (path: NodePath<types.MemberExpression>) {
       if (
         t.isIdentifier(path.node.object, {name: 'module'}) &&
         t.isIdentifier(path.node.property, {name: 'exports'})
       ) {
         if (
           t.isAssignmentExpression(path.parentPath.node) &&
-          t.isExpressionStatement(path.parentPath.parentPath.node)
+          t.isExpressionStatement(path.parentPath?.parentPath?.node)
         ) {
-          const assignmentExpression = path.parentPath
+          const assignmentExpression = path.parentPath as NodePath<types.AssignmentExpression>;
 
           // Scenario:
           // module.exports = require('foo');
@@ -88,14 +88,14 @@ const transform = ({ types: t }: { types: typeof types }) => ({
         else if (
           t.isMemberExpression(path.parentPath.node)
         ) {
-          const subMemberExpression = path.parentPath
-          const namedExport = subMemberExpression.node.property
+          const subMemberExpression = path.parentPath as NodePath<types.MemberExpression>;
+          const namedExport = subMemberExpression.node.property as types.Identifier;
 
           if (
             t.isAssignmentExpression(subMemberExpression.parentPath.node) &&
-            t.isExpressionStatement(subMemberExpression.parentPath.parentPath.node)
+            t.isExpressionStatement(subMemberExpression.parentPath?.parentPath?.node)
           ) {
-            const assignmentExpression = subMemberExpression.parentPath
+            const assignmentExpression = subMemberExpression.parentPath as NodePath<types.AssignmentExpression>;
 
             // Scenario:
             // module.exports.foo = require('bar');
@@ -109,10 +109,7 @@ const transform = ({ types: t }: { types: typeof types }) => ({
               assignmentExpression.parentPath.replaceWith(
                 t.exportNamedDeclaration(
                   null,
-                  [t.exportSpecifier(
-                    t.identifier('default'),
-                    namedExport
-                  )],
+                  [t.exportSpecifier(t.identifier('default'), namedExport)],
                   assignmentExpression.node.right.arguments[0]
                 )
               )
@@ -126,10 +123,7 @@ const transform = ({ types: t }: { types: typeof types }) => ({
                 t.exportNamedDeclaration(
                   t.variableDeclaration(
                     'var',
-                    [t.variableDeclarator(
-                      namedExport,
-                      assignmentExpression.node.right
-                    )]
+                    [t.variableDeclarator(namedExport, assignmentExpression.node.right)]
                   ),
                   []
                 )
@@ -143,8 +137,8 @@ const transform = ({ types: t }: { types: typeof types }) => ({
         t.isIdentifier(path.node.object, {name: 'exports'}) &&
         t.isAssignmentExpression(path.parentPath.node)
       ) {
-        const assignmentExpression = path.parentPath
-        const namedExport = path.node.property
+        const assignmentExpression = path.parentPath as NodePath<types.AssignmentExpression>
+        const namedExport = path.node.property as types.Identifier
 
         // Scenario:
         // exports.foo = require('bar');
@@ -158,10 +152,7 @@ const transform = ({ types: t }: { types: typeof types }) => ({
           assignmentExpression.parentPath.replaceWith(
             t.exportNamedDeclaration(
               null,
-              [t.exportSpecifier(
-                t.identifier('default'),
-                namedExport
-              )],
+              [t.exportSpecifier(t.identifier('default'), namedExport)],
               assignmentExpression.node.right.arguments[0]
             )
           )
@@ -188,10 +179,7 @@ const transform = ({ types: t }: { types: typeof types }) => ({
               t.exportNamedDeclaration(
                 t.variableDeclaration(
                   'var',
-                  [t.variableDeclarator(
-                    namedExport,
-                    assignmentExpression.node.right
-                  )]
+                  [t.variableDeclarator(namedExport, assignmentExpression.node.right)]
                 ),
                 []
               )
